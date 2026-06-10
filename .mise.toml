@@ -11,3 +11,15 @@ run = "uv sync"
 [tasks."scan"]
 description = "Scan for SMARTWIZ+ art devices"
 run = "uv run examples/scan_art_device.py"
+
+[tasks."connect"]
+description = "Connect the device to Wi-Fi using dynamic device name"
+run = """
+DEVICE_NAME=$(mise run scan | jq -r '.devices[0].local_name')
+if [ "$DEVICE_NAME" = "null" ] || [ -z "$DEVICE_NAME" ]; then
+  echo "Error: No device found."
+  exit 1
+fi
+echo "Connecting to $DEVICE_NAME..."
+uv run examples/connect_wifi.py "$DEVICE_NAME" "$WIFI_SSID" "$WIFI_PASS"
+"""
