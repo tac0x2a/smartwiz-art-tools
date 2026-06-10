@@ -1,0 +1,13 @@
+[tools]
+python = "3.12"
+
+[env]
+# ART_SDK_ROOT = "{{ config_root }}/examples"
+
+[tasks."setup"]
+description = "Install dependencies and setup environment"
+run = "uv sync"
+
+[tasks."scan"]
+description = "Scan for SMARTWIZ+ art devices"
+run = "uv run examples/scan_art_device.py"

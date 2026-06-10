@@ -1,0 +1,20 @@
+[project]
+name = "art"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bleak>=0.21.1",
+    "cryptography>=38.0.4",
+    "pillow>=12.2.0",
+    "pyblufi",
+    "requests>=2.34.2",
+]
+
+[tool.uv.extra-build-dependencies]
+pyobjc-core = ["setuptools"]
+pyobjc-framework-libdispatch = ["setuptools"]
+
+[tool.uv.sources]
+pyblufi = { git = "https://github.com/someburner/pyBlufi.git" }
