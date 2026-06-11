@@ -206,25 +206,32 @@ def convert_image_to_s6(input_image_path, output_s6_path):
     current_dir = Path(__file__).resolve().parent
     palette_png_path = current_dir / "palette.png"
 
-    # Check orientation with PIL
+    # Check orientation with PIL (only for decision to rotate if needed for layout)
     with Image.open(input_image_path) as img:
         w, h = img.size
+        # For a landscape display, we might still want to rotate portrait images
+        # so they fill the screen better before cropping.
         needs_rotation = h > w
 
     magick_args = [
         magick_cmd,
+        "-auto-orient",                    # Respect EXIF orientation
         str(input_image_path),
     ]
 
     if needs_rotation:
-        print("Portrait image detected. Rotating -90 degrees...")
+        print("Portrait image detected. Rotating -90 degrees for better fit...")
         magick_args.extend(["-rotate", "-90"])
 
     magick_args.extend([
-        "-modulate", "120,160,100",        # Increase brightness to 120% and saturation to 160%
-        "-contrast-stretch", "1%x1%",      # Auto-stretch contrast
-        "-sharpen", "0x1",                 # Sharpen edges for clearer E-ink display
-        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}!",
+        "-modulate", "120,160,100",        # Brightness 120%, Saturation 160%
+        "-gamma", "1.2",                   # Lighten midtones
+        "-contrast-stretch", "1%x1%",      # Improve contrast
+        "-sharpen", "0x1",                 # Enhance edges
+        # Center crop instead of stretching
+        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}^",
+        "-gravity", "center",
+        "-extent", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}",
         "-dither", "FloydSteinberg",
         "-define", "dither:diffusion-amount=100%",
         "-remap", str(palette_png_path),
