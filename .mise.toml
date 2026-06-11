@@ -23,3 +23,34 @@ fi
 echo "Connecting to $DEVICE_NAME..."
 uv run examples/connect_wifi.py "$DEVICE_NAME" "$WIFI_SSID" "$WIFI_PASS"
 """
+
+[tasks."upload"]
+description = "Convert and upload an image (JPG/PNG/GIF) to the device"
+usage = '''
+arg "<image_file>" help="Target file"
+'''
+run = """
+# Use the argument defined in usage
+INPUT_IMAGE="${usage_image_file?}"
+TEMP_S6="output_temp.s6"
+
+# Target resolution: if ART_IP is set, use it. Otherwise, try to resolve via scan.
+TARGET="${ART_IP}"
+if [ -z "$TARGET" ]; then
+  echo "ART_IP not set. Scanning for device..."
+  DEVICE_NAME=$(mise run scan | jq -r '.devices[0].local_name')
+  if [ "$DEVICE_NAME" = "null" ] || [ -z "$DEVICE_NAME" ]; then
+    echo "Error: Device not found and ART_IP is not set."
+    exit 1
+  fi
+  TARGET="$DEVICE_NAME"
+fi
+
+echo "Converting $INPUT_IMAGE to $TEMP_S6..."
+uv run examples/convert_image.py "$INPUT_IMAGE" "$TEMP_S6"
+
+echo "Uploading to $TARGET..."
+uv run examples/display_local_image.py "$TARGET" "$TEMP_S6"
+
+rm -f "$TEMP_S6"
+"""
