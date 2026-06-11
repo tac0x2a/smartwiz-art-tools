@@ -217,8 +217,8 @@ def convert_image_to_s6(input_image_path, output_s6_path):
     ]
 
     if needs_rotation:
-        print("Portrait image detected. Rotating 90 degrees...")
-        magick_args.extend(["-rotate", "90"])
+        print("Portrait image detected. Rotating -90 degrees...")
+        magick_args.extend(["-rotate", "-90"])
 
     magick_args.extend([
         "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}!",
