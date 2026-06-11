@@ -11,6 +11,7 @@ import json
 import os
 import zlib
 import sys
+import shutil
 from datetime import datetime
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -196,19 +197,49 @@ def convert_image_to_s6(input_image_path, output_s6_path):
     dither_png = input_image_path.with_suffix(input_image_path.suffix + ".dither.png")
     output_image = Path(output_s6_path)
 
+    # Detect ImageMagick command
+    magick_cmd = "magick" if shutil.which("magick") else "convert"
+    if not shutil.which(magick_cmd):
+        raise RuntimeError("ImageMagick (magick or convert) not found. Please install it.")
+
     # dither + remap
     current_dir = Path(__file__).resolve().parent
     palette_png_path = current_dir / "palette.png"
-    subprocess.run([
-        "convert",
-        str(input_image_path),
-        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}!",
-        "-colorspace", "RGB",
+
+    # Check orientation with PIL (only for decision to rotate if needed for layout)
+    with Image.open(input_image_path) as img:
+        w, h = img.size
+        # For a landscape display, we might still want to rotate portrait images
+        # so they fill the screen better before cropping.
+        needs_rotation = h > w
+
+    magick_args = [
+        magick_cmd,
+        str(input_image_path),             # Input image first for IMv7
+        "-auto-orient",                    # Respect EXIF orientation
+    ]
+
+    if needs_rotation:
+        print("Portrait image detected. Rotating -90 degrees for better fit...")
+        magick_args.extend(["-rotate", "-90"])
+
+    magick_args.extend([
+        "-modulate", "120,300,100",        # Brightness 120%, Saturation 200% (based on dither_frame)
+        "-gamma", "1.2",                   # Lighten midtones
+        "-contrast-stretch", "1%x1%",      # Improve contrast
+        "-sharpen", "0x1",                 # Enhance edges
+        # Fit within dimensions and pad with white (Letterbox)
+        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}",
+        "-background", "white",
+        "-gravity", "center",
+        "-extent", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}",
         "-dither", "FloydSteinberg",
-        "-define", f"dither:diffusion-amount=100%",
+        "-define", "dither:diffusion-amount=100%",
         "-remap", str(palette_png_path),
         str(dither_png)
     ])
+
+    subprocess.run(magick_args)
 
     img = Image.open(dither_png).convert("RGBA")
     width, height = img.size

@@ -18,8 +18,8 @@ def main():
         print("File not found.")
         sys.exit(1)
 
-    if not shutil.which("convert"):
-        print("`convert` not found. Please install imagemagick.")
+    if not shutil.which("convert") and not shutil.which("magick"):
+        print("ImageMagick (`magick` or `convert`) not found. Please install it.")
         sys.exit(1)
 
     try:

@@ -9,13 +9,20 @@ import epd_util
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(f"Usage: python3 device_register.py <device_id>")
+        print(f"Usage: python3 device_register.py <device_id_or_ip>")
         sys.exit(1)
 
     try:
         art_sdk_root = os.getcwd()
-        device_id = sys.argv[1]
-        api_url = f"http://smartwiz-art-{device_id}.local/api/control/request"
+        target = sys.argv[1]
+        
+        # Check if the target is an IP address or a device_id
+        if target.replace('.', '').isdigit() or target.endswith('.local'):
+            # It's an IP address or a full hostname
+            api_url = f"http://{target}/api/control/request"
+        else:
+            # It's a device_id
+            api_url = f"http://smartwiz-art-{target}.local/api/control/request"
 
         # Generate app private/public key pair if not exist
         private_key_path = f"{art_sdk_root}/app_private.der"
