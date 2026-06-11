@@ -26,15 +26,20 @@ uv run examples/connect_wifi.py "$DEVICE_NAME" "$WIFI_SSID" "$WIFI_PASS"
 
 [tasks."upload"]
 description = "Convert and upload an image (JPG/PNG/GIF) to the device"
-usage = "<image_file> [--crop]"
+usage = '''
+arg "<image_file>" help="Target file"
+flag "--crop" help="crop image" default="false"
+'''
+
+
 run = """
 # Use the argument defined in usage
-INPUT_IMAGE="{{ image_file }}"
+INPUT_IMAGE="${usage_image_file?}"
 TEMP_S6="output_temp.s6"
 
 # Check for --crop flag
 CONVERT_ARGS=""
-if [ "{{ crop }}" = "true" ]; then
+if [ "${usage_crop?}" = "true" ]; then
   CONVERT_ARGS="--crop"
   echo "Crop mode enabled (filling screen)..."
 else
