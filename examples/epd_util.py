@@ -224,7 +224,7 @@ def convert_image_to_s6(input_image_path, output_s6_path):
         magick_args.extend(["-rotate", "-90"])
 
     magick_args.extend([
-        "-modulate", "120,200,100",        # Brightness 120%, Saturation 200% (based on dither_frame)
+        "-modulate", "120,300,100",        # Brightness 120%, Saturation 200% (based on dither_frame)
         "-gamma", "1.2",                   # Lighten midtones
         "-contrast-stretch", "1%x1%",      # Improve contrast
         "-sharpen", "0x1",                 # Enhance edges

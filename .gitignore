@@ -206,3 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 .mise.local.toml
+
+# SMARTWIZ+ art security
+*.der
