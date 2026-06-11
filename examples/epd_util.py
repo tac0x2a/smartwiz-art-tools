@@ -205,16 +205,31 @@ def convert_image_to_s6(input_image_path, output_s6_path):
     # dither + remap
     current_dir = Path(__file__).resolve().parent
     palette_png_path = current_dir / "palette.png"
-    subprocess.run([
+
+    # Check orientation with PIL
+    with Image.open(input_image_path) as img:
+        w, h = img.size
+        needs_rotation = h > w
+
+    magick_args = [
         magick_cmd,
         str(input_image_path),
+    ]
+
+    if needs_rotation:
+        print("Portrait image detected. Rotating 90 degrees...")
+        magick_args.extend(["-rotate", "90"])
+
+    magick_args.extend([
         "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}!",
         "-colorspace", "RGB",
         "-dither", "FloydSteinberg",
-        "-define", f"dither:diffusion-amount=100%",
+        "-define", "dither:diffusion-amount=100%",
         "-remap", str(palette_png_path),
         str(dither_png)
     ])
+
+    subprocess.run(magick_args)
 
     img = Image.open(dither_png).convert("RGBA")
     width, height = img.size

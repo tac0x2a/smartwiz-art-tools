@@ -54,7 +54,7 @@ uv run examples/device_register.py <デバイスのIPアドレス>
 - **自動変換とアップロード (推奨)**:
   ```bash
   # 画像ファイルを指定して自動転送（JPG/PNG/GIF対応）
-  # 内部でSpectra 6形式への変換、device_idの解決、アップロード、表示更新を一括で行います
+  # 内部でSpectra 6形式への変換、自動回転（縦長画像の場合）、device_idの解決、アップロード、表示更新を一括で行います
   mise run upload <画像ファイルのパス>
   ```
 - **手動操作**:
