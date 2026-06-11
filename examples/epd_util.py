@@ -221,8 +221,10 @@ def convert_image_to_s6(input_image_path, output_s6_path):
         magick_args.extend(["-rotate", "-90"])
 
     magick_args.extend([
+        "-modulate", "120,160,100",        # Increase brightness to 120% and saturation to 160%
+        "-contrast-stretch", "1%x1%",      # Auto-stretch contrast
+        "-sharpen", "0x1",                 # Sharpen edges for clearer E-ink display
         "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}!",
-        "-colorspace", "RGB",
         "-dither", "FloydSteinberg",
         "-define", "dither:diffusion-amount=100%",
         "-remap", str(palette_png_path),
