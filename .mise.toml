@@ -26,7 +26,7 @@ uv run examples/connect_wifi.py "$DEVICE_NAME" "$WIFI_SSID" "$WIFI_PASS"
 
 [tasks."upload"]
 description = "Convert and upload an image (JPG/PNG/GIF) to the device"
-usage = "upload <image_file> [--crop]"
+usage = "<image_file> [--crop]"
 run = """
 # Use the argument defined in usage
 INPUT_IMAGE="{{ image_file }}"
