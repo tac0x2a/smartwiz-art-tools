@@ -215,8 +215,8 @@ def convert_image_to_s6(input_image_path, output_s6_path):
 
     magick_args = [
         magick_cmd,
+        str(input_image_path),             # Input image first for IMv7
         "-auto-orient",                    # Respect EXIF orientation
-        str(input_image_path),
     ]
 
     if needs_rotation:
@@ -224,12 +224,13 @@ def convert_image_to_s6(input_image_path, output_s6_path):
         magick_args.extend(["-rotate", "-90"])
 
     magick_args.extend([
-        "-modulate", "120,160,100",        # Brightness 120%, Saturation 160%
+        "-modulate", "120,200,100",        # Brightness 120%, Saturation 200% (based on dither_frame)
         "-gamma", "1.2",                   # Lighten midtones
         "-contrast-stretch", "1%x1%",      # Improve contrast
         "-sharpen", "0x1",                 # Enhance edges
-        # Center crop instead of stretching
-        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}^",
+        # Fit within dimensions and pad with white (Letterbox)
+        "-resize", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}",
+        "-background", "white",
         "-gravity", "center",
         "-extent", f"{IMAGE_WIDTH}x{IMAGE_HEIGHT}",
         "-dither", "FloydSteinberg",
