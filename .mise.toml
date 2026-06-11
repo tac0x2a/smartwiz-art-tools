@@ -61,6 +61,3 @@ uv run examples/display_local_image.py "$TARGET" "$TEMP_S6"
 
 rm -f "$TEMP_S6"
 """
-
-rm -f "$TEMP_S6"
-"""
